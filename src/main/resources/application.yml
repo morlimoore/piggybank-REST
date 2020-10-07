@@ -1,5 +1,11 @@
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: DEBUG
+
 spring:
-  datasource:
-    url: jdbc:postgresql://localhost:5432/piggybankdb
-    username: piggybankuser
-    password: password
+  profiles:
+    active: dev
+  jpa:
+    show-sql: true
