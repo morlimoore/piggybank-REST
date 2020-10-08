@@ -24,7 +24,7 @@ CREATE TABLE transactions (
     id BIGSERIAL PRIMARY KEY NOT NULL UNIQUE,
     amount BIGINT NOT NULL,
     type VARCHAR(25) NOT NULL,
-    remarks VARCHAR(25) NOT NULL,
+    remarks VARCHAR(100) NOT NULL,
     created_at TIMESTAMPTZ NOT NULL,
     user_id BIGINT NOT NULL
 );
