@@ -4,9 +4,16 @@ import org.modelmapper.ModelMapper;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.mail.MailException;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessagePreparator;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import javax.mail.internet.MimeMessage;
+import java.io.InputStream;
 
 @SpringBootApplication
 @EnableAsync
@@ -26,4 +33,48 @@ public class PiggybankApiApplication {
         return new BCryptPasswordEncoder();
     }
 
+    @Bean
+    JavaMailSender mailSender() {
+        return new JavaMailSender() {
+            @Override
+            public MimeMessage createMimeMessage() {
+                return null;
+            }
+
+            @Override
+            public MimeMessage createMimeMessage(InputStream inputStream) throws MailException {
+                return null;
+            }
+
+            @Override
+            public void send(MimeMessage mimeMessage) throws MailException {
+
+            }
+
+            @Override
+            public void send(MimeMessage... mimeMessages) throws MailException {
+
+            }
+
+            @Override
+            public void send(MimeMessagePreparator mimeMessagePreparator) throws MailException {
+
+            }
+
+            @Override
+            public void send(MimeMessagePreparator... mimeMessagePreparators) throws MailException {
+
+            }
+
+            @Override
+            public void send(SimpleMailMessage simpleMailMessage) throws MailException {
+
+            }
+
+            @Override
+            public void send(SimpleMailMessage... simpleMailMessages) throws MailException {
+
+            }
+        };
+    }
 }
