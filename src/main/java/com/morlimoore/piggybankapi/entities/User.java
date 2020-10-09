@@ -33,7 +33,6 @@ public class User {
     @Column(unique = true, nullable = false, length = 40)
     private String email;
 
-    @Lob
     @Column(nullable = false)
     private String password;
 
@@ -47,27 +46,28 @@ public class User {
     @Column(nullable = false)
     private Timestamp created_at;
 
+    @Column(nullable = false)
     private Boolean is_active;
 
-    @Lob
-    private String roles = "";
+    @Column(nullable = false, length = 25)
+    private String role;
 
     public User(String first_name, String last_name,
                 String email, String password, Date date_of_birth,
-                String roles) {
+                Boolean is_active, String role) {
         this.first_name = first_name;
         this.last_name = last_name;
         this.email = email;
         this.password = password;
         this.date_of_birth = date_of_birth;
-        this.is_active = true;
-        this.roles = roles;
+        this.is_active = is_active;
+        this.role = role;
     }
 
-    public List<String> getRoles() {
-        if (roles.length() > 0) {
-            return Arrays.asList(roles.split(","));
-        }
-        return new ArrayList<>();
-    }
+//    public List<String> getRoles() {
+//        if (role.length() > 0) {
+//            return Arrays.asList(role.split(","));
+//        }
+//        return new ArrayList<>();
+//    }
 }
