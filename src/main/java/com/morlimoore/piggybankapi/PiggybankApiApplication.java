@@ -10,4 +10,14 @@ public class PiggybankApiApplication {
         SpringApplication.run(PiggybankApiApplication.class, args);
     }
 
+    @Bean
+    ModelMapper modelMapper() {
+        return new ModelMapper();
+    }
+
+    @Bean
+    PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
 }
