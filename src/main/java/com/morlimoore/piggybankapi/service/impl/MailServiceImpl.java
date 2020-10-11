@@ -5,6 +5,7 @@ import com.morlimoore.piggybankapi.exceptions.CustomException;
 import com.morlimoore.piggybankapi.service.MailService;
 import com.morlimoore.piggybankapi.util.MailContentBuilder;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -39,7 +40,8 @@ public class MailServiceImpl implements MailService {
             mailSender.send(messagePreparator);
             log.info("Activation email sent!!");
         } catch (MailException e) {
-            throw new CustomException("Exception occured when sending mail to " + notificationEmail.getRecipient());
+            throw new CustomException("Exception occured when sending mail to "
+                    + notificationEmail.getRecipient(), HttpStatus.BAD_REQUEST);
         }
     }
 }
