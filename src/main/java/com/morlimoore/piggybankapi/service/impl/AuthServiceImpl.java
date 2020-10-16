@@ -26,6 +26,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.BindingResult;
 
 import javax.transaction.Transactional;
 import java.util.Optional;
@@ -67,7 +68,13 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     @Transactional
-    public ResponseEntity<ApiResponse<String>> signup(RegisterUserRequestDto registerUserRequestDto) {
+    public ResponseEntity<ApiResponse<String>> signup(RegisterUserRequestDto registerUserRequestDto, BindingResult result) {
+        if (result.hasErrors()) {
+            ApiResponse<String> response = new ApiResponse<>(HttpStatus.BAD_REQUEST);
+            response.setMessage("Validation error");
+            response.addValidationErrors(result.getFieldErrors());
+            return createResponse(response);
+        }
         User user = modelMapper.map(registerUserRequestDto, User.class);
         user.setRole("USER");
         user.setPassword(passwordEncoder.encode(registerUserRequestDto.getPassword()));
