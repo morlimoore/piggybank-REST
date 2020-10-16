@@ -4,11 +4,16 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Past;
 import javax.validation.constraints.Pattern;
 import java.sql.Timestamp;
+import java.util.Date;
+
 
 @Data
 @AllArgsConstructor
@@ -26,8 +31,9 @@ public class RegisterUserRequestDto extends BaseDto {
     private String phoneNumber;
 
     @Past
-    @NotBlank(message="Please enter a date of birth")
-    private String dateOfBirth;
+    @Temporal(TemporalType.DATE)
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private Date dateOfBirth;
 
     @CreationTimestamp
     private Timestamp createdAt;
