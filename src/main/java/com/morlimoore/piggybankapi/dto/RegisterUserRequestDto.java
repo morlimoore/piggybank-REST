@@ -21,7 +21,7 @@ public class RegisterUserRequestDto extends BaseDto {
     @NotBlank(message="Last name cannot be blank")
     private String lastName;
 
-    @Pattern(regexp="(^$|[0-9]{10})")
+    @Pattern(regexp="(^$|[0-9]{11})")
     @NotBlank(message="Please provide a valid phone number")
     private String phoneNumber;
 
