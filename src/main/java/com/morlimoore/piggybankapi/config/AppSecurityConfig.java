@@ -40,7 +40,7 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(WebSecurity web) {
-        web.ignoring().antMatchers("/api/auth/**");
+        web.ignoring().antMatchers("/auth/**");
     }
 
     @Override
