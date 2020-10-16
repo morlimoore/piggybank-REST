@@ -6,10 +6,13 @@ import com.morlimoore.piggybankapi.payload.ApiResponse;
 import com.morlimoore.piggybankapi.service.AuthService;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 @RestController
-@RequestMapping("api/auth")
+@RequestMapping("/auth")
 public class AuthController {
 
     private final AuthService authService;
@@ -19,8 +22,8 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<ApiResponse<String>> signup(@RequestBody RegisterUserRequestDto registerUserRequestDto) {
-        return authService.signup(registerUserRequestDto);
+    public ResponseEntity<ApiResponse<String>> signup(@Valid @RequestBody RegisterUserRequestDto registerUserRequestDto, BindingResult result) {
+        return authService.signup(registerUserRequestDto, result);
     }
 
     @GetMapping("/accountVerification/{token}")
