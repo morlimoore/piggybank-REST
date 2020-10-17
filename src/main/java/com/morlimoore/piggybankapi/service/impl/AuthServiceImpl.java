@@ -21,6 +21,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -111,6 +112,13 @@ public class AuthServiceImpl implements AuthService {
             response.setError(e.getMessage());
             response.setMessage("Bad credentials");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED.value()).body(response);
+
+        } catch (DisabledException e) {
+            ApiResponse<?> response = new ApiResponse<>(FORBIDDEN);
+            response.setError(e.getMessage());
+            response.setMessage("Please, activate your account first");
+            response.setDebugMessage("Click the account verification link sent to the email address you provided on sign up.");
+            return ResponseEntity.status(FORBIDDEN.value()).body(response);
         }
         SecurityContextHolder.getContext().setAuthentication(authenticate);
         System.out.println("*AuthService* authenticate: " + authenticate.getName());
