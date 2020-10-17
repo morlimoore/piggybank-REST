@@ -9,6 +9,12 @@ logging:
       hibernate:
         SQL: DEBUG
 
+application:
+  jwt:
+    secret-key: xxxxx
+    login-expire-length: 86400000
+    reset-password-expire-length: 60000
+
 spring:
   profiles:
     active: dev

@@ -16,9 +16,3 @@ spring:
     username: xxxxx
     password: xxxxx
     protocol: smtp
-
-application:
-  jwt:
-    secret-key: xxxxx
-    login-expire-length: 86400000
-    reset-password-expire-length: 60000
