@@ -73,6 +73,8 @@ public class AuthServiceImpl implements AuthService {
         if (result.hasErrors()) {
             ApiResponse<String> response = new ApiResponse<>(HttpStatus.BAD_REQUEST);
             response.setMessage("Validation error");
+            response.setDebugMessage(result.getFieldError().getDefaultMessage());
+            response.setError(result.getFieldError().toString());
             response.addValidationErrors(result.getFieldErrors());
             return createResponse(response);
         }
