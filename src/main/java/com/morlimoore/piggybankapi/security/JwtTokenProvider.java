@@ -20,7 +20,7 @@ import java.util.Base64;
 import java.util.Date;
 
 @Component
-@PropertySource("classpath:application-dev.yml")
+@PropertySource("classpath:application.yml")
 public class JwtTokenProvider {
     private static final Logger logger = LoggerFactory.getLogger(JwtTokenProvider.class);
 
