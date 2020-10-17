@@ -117,10 +117,12 @@ public class AuthServiceImpl implements AuthService {
                     loginUserRequestDto.getEmail(),
                     loginUserRequestDto.getPassword()
             ));
+
         } catch (BadCredentialsException e) {
             ApiResponse<?> response = new ApiResponse<>(HttpStatus.UNAUTHORIZED);
             response.setError(e.getMessage());
-            response.setMessage("Bad credentials");
+            response.setMessage("Email or password is incorrect");
+            response.setDebugMessage("Click the password reset button to reset your password");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED.value()).body(response);
 
         } catch (DisabledException e) {
@@ -130,6 +132,7 @@ public class AuthServiceImpl implements AuthService {
             response.setDebugMessage("Click the account verification link sent to the email address you provided on sign up.");
             return ResponseEntity.status(FORBIDDEN.value()).body(response);
         }
+
         SecurityContextHolder.getContext().setAuthentication(authenticate);
         System.out.println("*AuthService* authenticate: " + authenticate.getName());
         String token = jwtProvider.createLoginToken(authenticate.getName());
