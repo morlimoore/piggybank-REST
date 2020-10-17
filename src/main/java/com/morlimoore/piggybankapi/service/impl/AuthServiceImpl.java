@@ -103,6 +103,14 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public ResponseEntity<Object> login(LoginUserRequestDto loginUserRequestDto) {
+        if (!userRepository.getUserByEmail(loginUserRequestDto.getEmail()).isPresent()) {
+            ApiResponse<?> response = new ApiResponse<>(FORBIDDEN);
+            response.setError("User not found");
+            response.setMessage("Account does not exist");
+            response.setDebugMessage("Sign up to create an account with us");
+            return ResponseEntity.status(FORBIDDEN.value()).body(response);
+        }
+
         Authentication authenticate = null;
         try {
             authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
