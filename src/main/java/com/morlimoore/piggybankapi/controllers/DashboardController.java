@@ -6,11 +6,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("api/dashboard")
+@RequestMapping("/dashboard")
 public class DashboardController {
 
-    @PostMapping("/index")
-    public String dashboard(@RequestBody NotificationEmail notificationEmail) {
+    @GetMapping("/index")
+    public String dashboard() {
         return "dashboard";
     }
 }
