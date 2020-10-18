@@ -23,17 +23,23 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
                          HttpServletResponse httpServletResponse,
                          AuthenticationException e) throws IOException {
         logger.error("Responding with unauthorized error. Message - {}", e.getMessage());
+
         HttpStatus status = HttpStatus.FORBIDDEN;
         String error = "FORBIDDEN";
-        String message = "";
+        String message = e.getMessage();
+        String debug = "Get proper authentication";
+
         if (e.getMessage().contains("JWT expired at")){
             status = HttpStatus.UNAUTHORIZED;
             error = "Token has expired";
             message = e.getMessage();
+            debug = "Obtain a fresh token";
         }
+
         ApiResponse<?> res = new ApiResponse<>(status);
         res.setError(error);
         res.setMessage(message);
+        res.setDebugMessage(debug);
         //set the response headers
         httpServletResponse.setStatus(status.value());
         httpServletResponse.setContentType("application/json");
