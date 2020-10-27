@@ -8,7 +8,7 @@ import org.springframework.validation.BindingResult;
 
 public interface AuthService {
 
-    ResponseEntity<ApiResponse<String>> signup(RegisterUserRequestDto registerUserRequestDto, BindingResult result);
+    Boolean signup(RegisterUserRequestDto registerUserRequestDto);
 
     ResponseEntity<ApiResponse<String>> verifyAccount(String token);
 

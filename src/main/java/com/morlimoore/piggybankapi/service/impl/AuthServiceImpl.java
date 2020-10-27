@@ -27,7 +27,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.BindingResult;
 
 import javax.transaction.Transactional;
 import java.util.Optional;
@@ -69,20 +68,16 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     @Transactional
-    public ResponseEntity<ApiResponse<String>> signup(RegisterUserRequestDto registerUserRequestDto, BindingResult result) {
-        if (result.hasErrors()) {
-            ApiResponse<String> response = new ApiResponse<>(HttpStatus.BAD_REQUEST);
-            response.setMessage("Validation error");
-            response.setDebugMessage(result.getFieldError().getDefaultMessage());
-            response.setError(result.getFieldError().toString());
-            response.addValidationErrors(result.getFieldErrors());
-            return createResponse(response);
-        }
+    public Boolean signup(RegisterUserRequestDto registerUserRequestDto) {
         User user = modelMapper.map(registerUserRequestDto, User.class);
         user.setRole("USER");
         user.setPassword(passwordEncoder.encode(registerUserRequestDto.getPassword()));
         user.setIsEnabled(false);
-        userRepository.save(user);
+        try {
+            userRepository.save(user);
+        } catch (Exception e) {
+            throw new CustomException("User with email already exists", BAD_REQUEST);
+        }
         User tempUser = userRepository.getUserByEmail(user.getEmail()).get();
         String signUpToken = signupTokenService.getToken();
         Token token = new Token();
@@ -95,10 +90,18 @@ public class AuthServiceImpl implements AuthService {
                 user.getEmail(), "Thank you for signing up to PiggyBank App, please click on " +
                 "below url to activate your account : " +
                 "http://localhost:8080/api/auth/accountVerification/" + token));
-        ApiResponse<String> response = new ApiResponse<>(OK);
-        response.setData("User Registration Successful");
-        response.setMessage("Success");
-        return createResponse(response);
+
+        return true;
+
+//        try {
+//            User user = userRepository.getUserByEmail("email")
+//                    .orElseThrow(() -> new CustomException("user with email already exists", BAD_REQUEST));
+//
+//            userRepository.save(registerUserRequestDto);
+//
+//        } catch(Exception exception) {
+//            throw new CustomException(exception.getMessage(), BAD_REQUEST);
+//        }
     }
 
     @Override
@@ -136,7 +139,7 @@ public class AuthServiceImpl implements AuthService {
         SecurityContextHolder.getContext().setAuthentication(authenticate);
         logger.info("Authenticate: " + authenticate.getName());
         String token = jwtProvider.createLoginToken(authenticate.getName());
-        logger.info(token);
+        logger.info("Token: " + token);
         AuthResponseDto authResponseDto = new AuthResponseDto(token, loginUserRequestDto.getEmail());
         ApiResponse<AuthResponseDto> response = new ApiResponse<>(OK);
         response.setData(authResponseDto);
