@@ -72,7 +72,7 @@ public class JwtTokenProvider {
         return null;
     }
 
-    public boolean validateToken(String token) {
+    public boolean validateToken(String token) throws CustomException {
         // this also checks if the token is expired
         try {
             Jwts.parser()
