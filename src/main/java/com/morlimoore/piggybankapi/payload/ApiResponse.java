@@ -25,7 +25,7 @@ public class ApiResponse<T> {
     private List<ApiSubError> subErrors;
     private T data;
 
-    private ApiResponse() {
+    public ApiResponse() {
         timestamp = LocalDateTime.now();
     }
 
