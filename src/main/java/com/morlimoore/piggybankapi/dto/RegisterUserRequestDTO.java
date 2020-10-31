@@ -17,7 +17,7 @@ import java.sql.Date;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class RegisterUserRequestDto extends BaseDto {
+public class RegisterUserRequestDTO extends BaseDTO {
 
     @NotBlank(message="First name cannot be blank")
     private String firstName;

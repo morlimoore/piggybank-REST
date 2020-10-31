@@ -1,16 +1,15 @@
 package com.morlimoore.piggybankapi.service;
 
-import com.morlimoore.piggybankapi.dto.LoginUserRequestDto;
-import com.morlimoore.piggybankapi.dto.RegisterUserRequestDto;
+import com.morlimoore.piggybankapi.dto.LoginUserRequestDTO;
+import com.morlimoore.piggybankapi.dto.RegisterUserRequestDTO;
 import com.morlimoore.piggybankapi.payload.ApiResponse;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 
 public interface AuthService {
 
-    Boolean signup(RegisterUserRequestDto registerUserRequestDto);
+    Boolean signup(RegisterUserRequestDTO registerUserRequestDto);
 
     ResponseEntity<ApiResponse<String>> verifyAccount(String token);
 
-    ResponseEntity<Object> login(LoginUserRequestDto loginUserRequestDto);
+    ResponseEntity<Object> login(LoginUserRequestDTO loginUserRequestDto);
 }

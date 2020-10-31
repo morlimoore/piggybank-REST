@@ -16,7 +16,7 @@ public class RegisterUserRequestDtoTest {
     @Test
     @DisplayName("register user request - 🌱")
     public void registerUserRequest() {
-        RegisterUserRequestDto registerUserRequestDto = new RegisterUserRequestDto();
+        RegisterUserRequestDTO registerUserRequestDto = new RegisterUserRequestDTO();
         registerUserRequestDto.setCreatedAt(date);
         registerUserRequestDto.setDateOfBirth(dob);
         registerUserRequestDto.setFirstName("John");
@@ -35,7 +35,7 @@ public class RegisterUserRequestDtoTest {
     @Test
     @DisplayName("register user request")
     public void registerUserRequestInitialisedWithConstructor() {
-        RegisterUserRequestDto registerUserRequestDto = new RegisterUserRequestDto("John", "Doe", "0000", dob, date);
+        RegisterUserRequestDTO registerUserRequestDto = new RegisterUserRequestDTO("John", "Doe", "0000", dob, date);
 
         assertEquals("John", registerUserRequestDto.getFirstName());
         assertEquals("Doe", registerUserRequestDto.getLastName());

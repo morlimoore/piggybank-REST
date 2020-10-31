@@ -1,6 +1,6 @@
 package com.morlimoore.piggybankapi.integrations;
 
-import com.morlimoore.piggybankapi.dto.RegisterUserRequestDto;
+import com.morlimoore.piggybankapi.dto.RegisterUserRequestDTO;
 import com.morlimoore.piggybankapi.entities.User;
 import com.morlimoore.piggybankapi.repositories.UserRepository;
 import com.morlimoore.piggybankapi.security.JwtTokenProvider;
@@ -13,10 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.jdbc.EmbeddedDatabaseConnection;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.sql.Date;
@@ -47,9 +45,9 @@ public class AuthControllerTest {
 
     Date dob;
 
-    RegisterUserRequestDto registerUserRequestDto = new RegisterUserRequestDto();
+    RegisterUserRequestDTO registerUserRequestDto = new RegisterUserRequestDTO();
 
-    RegisterUserRequestDto registerUserRequestDto2 = new RegisterUserRequestDto();
+    RegisterUserRequestDTO registerUserRequestDto2 = new RegisterUserRequestDTO();
 
     @BeforeAll
     public void setUp() {

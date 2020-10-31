@@ -1,8 +1,8 @@
 package com.morlimoore.piggybankapi.service.impl;
 
-import com.morlimoore.piggybankapi.dto.AuthResponseDto;
-import com.morlimoore.piggybankapi.dto.LoginUserRequestDto;
-import com.morlimoore.piggybankapi.dto.RegisterUserRequestDto;
+import com.morlimoore.piggybankapi.dto.AuthResponseDTO;
+import com.morlimoore.piggybankapi.dto.LoginUserRequestDTO;
+import com.morlimoore.piggybankapi.dto.RegisterUserRequestDTO;
 import com.morlimoore.piggybankapi.entities.NotificationEmail;
 import com.morlimoore.piggybankapi.entities.Token;
 import com.morlimoore.piggybankapi.entities.User;
@@ -68,7 +68,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     @Transactional
-    public Boolean signup(RegisterUserRequestDto registerUserRequestDto) {
+    public Boolean signup(RegisterUserRequestDTO registerUserRequestDto) {
         User user = modelMapper.map(registerUserRequestDto, User.class);
         user.setRole("USER");
         user.setPassword(passwordEncoder.encode(registerUserRequestDto.getPassword()));
@@ -105,7 +105,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public ResponseEntity<Object> login(LoginUserRequestDto loginUserRequestDto) {
+    public ResponseEntity<Object> login(LoginUserRequestDTO loginUserRequestDto) {
         if (!userRepository.getUserByEmail(loginUserRequestDto.getEmail()).isPresent()) {
             ApiResponse<?> response = new ApiResponse<>(FORBIDDEN);
             response.setError("User not found");
@@ -140,8 +140,8 @@ public class AuthServiceImpl implements AuthService {
         logger.info("Authenticate: " + authenticate.getName());
         String token = jwtProvider.createLoginToken(authenticate.getName());
         logger.info("Token: " + token);
-        AuthResponseDto authResponseDto = new AuthResponseDto(token, loginUserRequestDto.getEmail());
-        ApiResponse<AuthResponseDto> response = new ApiResponse<>(OK);
+        AuthResponseDTO authResponseDto = new AuthResponseDTO(token, loginUserRequestDto.getEmail());
+        ApiResponse<AuthResponseDTO> response = new ApiResponse<>(OK);
         response.setData(authResponseDto);
         return ResponseEntity.ok(response);
     }
