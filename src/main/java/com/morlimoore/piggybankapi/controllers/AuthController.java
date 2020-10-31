@@ -1,7 +1,7 @@
 package com.morlimoore.piggybankapi.controllers;
 
-import com.morlimoore.piggybankapi.dto.LoginUserRequestDto;
-import com.morlimoore.piggybankapi.dto.RegisterUserRequestDto;
+import com.morlimoore.piggybankapi.dto.LoginUserRequestDTO;
+import com.morlimoore.piggybankapi.dto.RegisterUserRequestDTO;
 import com.morlimoore.piggybankapi.payload.ApiResponse;
 import com.morlimoore.piggybankapi.service.AuthService;
 
@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
-import static com.morlimoore.piggybankapi.util.CreateResponse.createResponse;
+import static com.morlimoore.piggybankapi.util.CreateResponse.*;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.HttpStatus.OK;
 
@@ -27,16 +27,9 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<ApiResponse<String>> signup(@Valid @RequestBody RegisterUserRequestDto registerUserRequestDto, BindingResult result) {
-        ResponseEntity <ApiResponse<String>> res = null;
-        if (result.hasErrors()) {
-            ApiResponse<String> response = new ApiResponse<>(HttpStatus.BAD_REQUEST);
-            response.setMessage("Validation error");
-            response.setDebugMessage(result.getFieldError().getDefaultMessage());
-            response.setError(result.getFieldError().toString());
-            response.addValidationErrors(result.getFieldErrors());
-            return createResponse(response);
-        }
+    public ResponseEntity<ApiResponse<String>> signup(@Valid @RequestBody RegisterUserRequestDTO registerUserRequestDto, BindingResult result) {
+        if (result.hasErrors())
+            bindingResultError(result);
         if (authService.signup(registerUserRequestDto)) {
             ApiResponse<String> response = new ApiResponse<>(OK);
             response.setData("User Registration Successful");
