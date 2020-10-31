@@ -1,7 +1,9 @@
 package com.morlimoore.piggybankapi.security;
 
+import com.morlimoore.piggybankapi.exceptions.CustomException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -30,9 +32,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 Authentication auth = jwtTokenProvider.getAuthentication(token); // this throws exception
                 SecurityContextHolder.getContext().setAuthentication(auth);
             } else {
-                throw new Exception("UNAUTHORIZED");
+                throw new CustomException("UNAUTHORIZED", HttpStatus.UNAUTHORIZED);
             }
-        } catch (Exception e) {
+        } catch (CustomException e) {
             logger.error("Could not set user authentication in security context", e);
             SecurityContextHolder.clearContext();
         }
