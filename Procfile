@@ -1,1 +1,1 @@
-web: java -jar target/piggybank-api.jar
+web: java -jar target/piggybank-api-v1.jar
