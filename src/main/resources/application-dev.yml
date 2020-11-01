@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/piggybankdb
-    username: piggybankuser
-    password: password
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/piggybankdb}
+    username: ${SPRING_DATASOURCE_USERNAME:piggybankuser}
+    password: ${SPRING_DATASOURCE_PASSWORD:password}
     driverClassName: org.postgresql.Driver
   jpa:
     generate-ddl: true
