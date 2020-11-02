@@ -53,16 +53,19 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-                .csrf().disable()
-                .exceptionHandling()
-                .authenticationEntryPoint(unauthorizedHandler)
+                .cors()
+                .and()
+                .csrf()
+                .disable()
+                .authorizeRequests()
+                .anyRequest()
+                .authenticated()
                 .and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .authorizeRequests()
-                .anyRequest()
-                .authenticated();
+                .exceptionHandling()
+                .authenticationEntryPoint(unauthorizedHandler);
         http.apply(new JwtTokenFilterConfig(tokenProvider));
     }
 
