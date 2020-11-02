@@ -17,12 +17,14 @@ import org.springframework.mail.javamail.MimeMessagePreparator;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import javax.mail.internet.MimeMessage;
 import java.io.InputStream;
 
 @SpringBootApplication
 @EnableAsync
+@EnableSwagger2
 public class PiggybankApiApplication {
 
     public static void main(String[] args) {
