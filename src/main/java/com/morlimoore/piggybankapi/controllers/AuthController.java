@@ -5,7 +5,6 @@ import com.morlimoore.piggybankapi.dto.RegisterUserRequestDTO;
 import com.morlimoore.piggybankapi.payload.ApiResponse;
 import com.morlimoore.piggybankapi.service.AuthService;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
