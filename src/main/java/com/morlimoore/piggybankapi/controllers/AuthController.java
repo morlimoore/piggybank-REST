@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 import static com.morlimoore.piggybankapi.util.CreateResponse.*;
-import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
-import static org.springframework.http.HttpStatus.OK;
+import static com.morlimoore.piggybankapi.util.Validator.validateDateOfBirth;
+import static org.springframework.http.HttpStatus.*;
 
 @RestController
 @RequestMapping("/auth")
@@ -29,8 +29,13 @@ public class AuthController {
     @PostMapping("/signup")
     public ResponseEntity<ApiResponse<String>> signup(@Valid @RequestBody RegisterUserRequestDTO registerUserRequestDto, BindingResult result) {
         if (result.hasErrors())
-            bindingResultError(result);
-        if (authService.signup(registerUserRequestDto)) {
+            return bindingResultError(result);
+        else if (!validateDateOfBirth(registerUserRequestDto.getDateOfBirth())) {
+            ApiResponse<String> response = new ApiResponse<>(BAD_REQUEST);
+            response.setError("User must be equal to or above 18 years of age");
+            response.setMessage("Invalid date of birth");
+            return createResponse(response);
+        } else if (authService.signup(registerUserRequestDto)) {
             ApiResponse<String> response = new ApiResponse<>(OK);
             response.setData("User Registration Successful");
             response.setMessage("Success");
