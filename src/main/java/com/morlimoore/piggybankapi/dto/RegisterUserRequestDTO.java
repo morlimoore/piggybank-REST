@@ -2,15 +2,10 @@ package com.morlimoore.piggybankapi.dto;
 
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
-import org.springframework.format.annotation.DateTimeFormat;
-
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Past;
 import javax.validation.constraints.Pattern;
 import java.sql.Timestamp;
-import java.sql.Date;
 import java.time.LocalDate;
 
 
@@ -30,7 +25,7 @@ public class RegisterUserRequestDTO extends BaseDTO {
     @NotBlank(message="Please provide a valid phone number")
     private String phoneNumber;
 
-
+    @Past(message="Birth date cannot be a future date")
     private LocalDate dateOfBirth;
 
     @CreationTimestamp
