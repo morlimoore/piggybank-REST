@@ -22,6 +22,7 @@ services:
     build:
       context: . # Use an image built from the specified dockerfile in the app directory.
       dockerfile: Dockerfile
+    image: piggybank-api:v1
     ports:
       - 8443:8443 # Forward the exposed port 8080 on the container to port 8080 on the host machine
     depends_on:
