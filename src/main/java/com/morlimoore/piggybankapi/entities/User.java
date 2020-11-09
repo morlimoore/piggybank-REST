@@ -5,7 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.sql.Date;
+import java.time.LocalDate;
 
 @Data
 @AllArgsConstructor
@@ -30,7 +30,7 @@ public class User extends BaseEntity {
     private String phoneNumber;
 
     @Column(name = "date_of_birth", nullable = false)
-    private Date dateOfBirth;
+    private LocalDate dateOfBirth;
 
     @Column(name = "is_enabled", nullable = false)
     private Boolean isEnabled;
@@ -39,7 +39,7 @@ public class User extends BaseEntity {
     private String role;
 
     public User(String firstName, String lastName,
-                String email, String password, Date dateOfBirth,
+                String email, String password, LocalDate dateOfBirth,
                 Boolean isEnabled, String role) {
         this.firstName = firstName;
         this.lastName = lastName;

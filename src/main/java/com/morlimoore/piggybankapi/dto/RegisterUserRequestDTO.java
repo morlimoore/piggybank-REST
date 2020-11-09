@@ -11,6 +11,7 @@ import javax.validation.constraints.Past;
 import javax.validation.constraints.Pattern;
 import java.sql.Timestamp;
 import java.sql.Date;
+import java.time.LocalDate;
 
 
 @Getter
@@ -29,10 +30,8 @@ public class RegisterUserRequestDTO extends BaseDTO {
     @NotBlank(message="Please provide a valid phone number")
     private String phoneNumber;
 
-    @Past
-    @Temporal(TemporalType.DATE)
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private Date dateOfBirth;
+
+    private LocalDate dateOfBirth;
 
     @CreationTimestamp
     private Timestamp createdAt;

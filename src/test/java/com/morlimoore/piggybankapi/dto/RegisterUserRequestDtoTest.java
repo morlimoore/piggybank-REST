@@ -4,14 +4,14 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.sql.Timestamp;
-import java.sql.Date;
+import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class RegisterUserRequestDtoTest {
 
     Timestamp date;
-    Date dob;
+    LocalDate dob;
 
     @Test
     @DisplayName("register user request - 🌱")
