@@ -22,6 +22,7 @@ public class Token extends BaseEntity {
     @Column(name = "is_valid", nullable = false)
     private Boolean isValid;
 
+    //TODO: Investigate possible wrong use of annotation mapping
     @ManyToOne
     @JoinColumn(name="user_id", nullable = false)
     private User user;

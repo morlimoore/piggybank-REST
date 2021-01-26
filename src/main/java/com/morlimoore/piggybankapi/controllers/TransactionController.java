@@ -29,7 +29,7 @@ public class TransactionController {
     private static final Logger logger = LoggerFactory.getLogger(TransactionController.class);
     private TransactionService transactionService;
 
-    //TODO: Troubleshoot that the current deposit transaction does not wipe off the initial transaction
+    //TODO: Troubleshoot that the current deposit transaction does wipe off the initial transaction
     @PostMapping("/deposit")
     public ResponseEntity<ApiResponse<String>> deposit(@Valid @RequestBody UserTransactionDTO userTransactionDTO, BindingResult result) {
         ApiResponse<String> response = new ApiResponse<>();
