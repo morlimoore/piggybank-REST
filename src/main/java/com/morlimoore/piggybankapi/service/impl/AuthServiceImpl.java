@@ -1,9 +1,9 @@
 package com.morlimoore.piggybankapi.service.impl;
 
+import com.mashape.unirest.http.exceptions.UnirestException;
 import com.morlimoore.piggybankapi.dto.AuthResponseDTO;
 import com.morlimoore.piggybankapi.dto.LoginUserRequestDTO;
 import com.morlimoore.piggybankapi.dto.RegisterUserRequestDTO;
-import com.morlimoore.piggybankapi.entities.NotificationEmail;
 import com.morlimoore.piggybankapi.entities.Token;
 import com.morlimoore.piggybankapi.entities.User;
 import com.morlimoore.piggybankapi.exceptions.CustomException;
@@ -68,17 +68,17 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     @Transactional
-    public Boolean signup(RegisterUserRequestDTO registerUserRequestDto) {
+    public Boolean signup(RegisterUserRequestDTO registerUserRequestDto) throws UnirestException {
         User user = modelMapper.map(registerUserRequestDto, User.class);
         user.setRole("USER");
         user.setPassword(passwordEncoder.encode(registerUserRequestDto.getPassword()));
         user.setIsEnabled(false);
+        User tempUser = null;
         try {
-            userRepository.save(user);
+            tempUser = userRepository.save(user);
         } catch (Exception e) {
             throw new CustomException("User with email already exists", BAD_REQUEST);
         }
-        User tempUser = userRepository.getUserByEmail(user.getEmail()).get();
         String signUpToken = signupTokenService.getToken();
         Token token = new Token();
         token.setToken(signUpToken);
@@ -86,22 +86,9 @@ public class AuthServiceImpl implements AuthService {
         token.setIsValid(true);
         token.setUser(tempUser);
         tokenRepository.save(token);
-        mailService.sendMail(new NotificationEmail("Please activate your account",
-                user.getEmail(), "Thank you for signing up to PiggyBank App, please click on " +
-                "below url to activate your account : " +
-                "http://localhost:8080/api/auth/accountVerification/" + token));
+        mailService.sendActivationMail(tempUser.getEmail(), token.getToken());
 
         return true;
-
-//        try {
-//            User user = userRepository.getUserByEmail("email")
-//                    .orElseThrow(() -> new CustomException("user with email already exists", BAD_REQUEST));
-//
-//            userRepository.save(registerUserRequestDto);
-//
-//        } catch(Exception exception) {
-//            throw new CustomException(exception.getMessage(), BAD_REQUEST);
-//        }
     }
 
     @Override

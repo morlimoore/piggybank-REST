@@ -1,7 +1,9 @@
 package com.morlimoore.piggybankapi.service;
 
-import com.morlimoore.piggybankapi.entities.NotificationEmail;
+import com.mashape.unirest.http.exceptions.UnirestException;
 
 public interface MailService {
-    void sendMail(NotificationEmail notificationEmail);
+
+    void sendActivationMail(String email, String token) throws UnirestException;
+
 }

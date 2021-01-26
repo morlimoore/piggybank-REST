@@ -1,47 +1,30 @@
 package com.morlimoore.piggybankapi.service.impl;
 
-import com.morlimoore.piggybankapi.entities.NotificationEmail;
-import com.morlimoore.piggybankapi.exceptions.CustomException;
+import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
 import com.morlimoore.piggybankapi.service.MailService;
-import com.morlimoore.piggybankapi.util.MailContentBuilder;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.mail.MailException;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.mail.javamail.MimeMessagePreparator;
-import org.springframework.scheduling.annotation.Async;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
-@Slf4j
 public class MailServiceImpl implements MailService {
 
-    private final JavaMailSender mailSender;
-    private final MailContentBuilder mailContentBuilder;
+    @Value("${application.mail-client.password}")
+    private String password;
 
-    public MailServiceImpl(JavaMailSender mailSender,
-                           MailContentBuilder mailContentBuilder) {
-        this.mailSender = mailSender;
-        this.mailContentBuilder = mailContentBuilder;
-    }
+    @Value("${application.mail-client.domain}")
+    private String domain;
 
     @Override
-    @Async
-    public void sendMail(NotificationEmail notificationEmail) {
-        MimeMessagePreparator messagePreparator = mimeMessage -> {
-            MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage);
-            messageHelper.setFrom("signup@piggybankplc.com");
-            messageHelper.setTo(notificationEmail.getRecipient());
-            messageHelper.setSubject(notificationEmail.getSubject());
-            messageHelper.setText(mailContentBuilder.build(notificationEmail.getBody()));
-        };
-        try {
-            mailSender.send(messagePreparator);
-            log.info("Activation email sent!!");
-        } catch (MailException e) {
-            throw new CustomException("Exception occured when sending mail to "
-                    + notificationEmail.getRecipient(), HttpStatus.BAD_REQUEST);
-        }
+    public void sendActivationMail(String email, String token) throws UnirestException {
+        Unirest.post("https://api.mailgun.net/v3/" + domain + "/messages")
+            .basicAuth("api", password)
+            .queryString("from", "SAVE-SAFE Admin <admin@savesafe.com>")
+            .queryString("to", email)
+            .queryString("subject", "Welcome to Save Safe")
+            .queryString("text", "Thank you for signing up to the SAVE-SAFE App. \n" +
+                    "Please click on, or copy and paste the below URI in your browser, to activate your account: \n" +
+                    "https://localhost:8443/api/v1/auth/accountVerification/" + token)
+            .asJson();
     }
 }
