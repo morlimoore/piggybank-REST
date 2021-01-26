@@ -4,6 +4,9 @@ spring:
     username: ${SPRING_DATASOURCE_USERNAME:piggybankuser}
     password: ${SPRING_DATASOURCE_PASSWORD:vikkidchamp}
     driverClassName: org.postgresql.Driver
+  profiles:
+    active: dev
+
   jpa:
     generate-ddl: true
     properties:
