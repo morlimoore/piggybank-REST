@@ -1,0 +1,33 @@
+server:
+  port: ${PORT:8443}
+  servlet:
+    context-path: "/api/v1"
+  ssl:
+    enabled: true
+    key-store: src/main/resources/piggybankcert.p12
+    key-store-password: piggybankcert
+    key-store-type: PKCS12
+    key-alias: piggybankcert
+
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: DEBUG
+
+application.jwt.secretKey: piggybankappsecretkey
+application.jwt.validityPeriod: 86400000
+application.jwt.resetPassword-expire-length: 60000
+
+application.mailClient.password:
+application.mailClient.domain:
+
+spring:
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: Africa/Lagos
