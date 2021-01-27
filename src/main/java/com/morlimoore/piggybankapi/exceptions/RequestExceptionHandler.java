@@ -5,8 +5,9 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.validation.BindException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -15,67 +16,62 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import javax.validation.ConstraintViolationException;
 
-/**
- * RequestExceptionHandler
- */
+import static com.morlimoore.piggybankapi.util.CreateResponse.createResponse;
+import static com.morlimoore.piggybankapi.util.CreateResponse.errorResponse;
+import static org.springframework.http.HttpStatus.*;
+
 @ControllerAdvice
 public class RequestExceptionHandler extends ResponseEntityExceptionHandler {
+
     @ExceptionHandler(CustomException.class)
-    public ResponseEntity<Object> handleCustomException(CustomException ce) {
-        ApiResponse<?> ar = new ApiResponse<>(ce.getStatus());
-        ar.setError(ce.getMessage());
-        return buildResponseEntity(ar);
+    public ResponseEntity<ApiResponse<String>> handleCustomException(CustomException e) {
+        return errorResponse(e.getLocalizedMessage(), INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<Object> handleConstraintViolationException(ConstraintViolationException cve) {
-        ApiResponse<?> ar = new ApiResponse<>(HttpStatus.BAD_REQUEST);
-        ar.addValidationErrors(cve.getConstraintViolations());
-        ar.setError("Validation Error");
-        return buildResponseEntity(ar);
+    public ResponseEntity<ApiResponse<String>> handleConstraintViolationException(ConstraintViolationException e) {
+        return errorResponse(e.getLocalizedMessage(), BAD_REQUEST);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<Object> handleIllegalArgumentException(IllegalArgumentException iae) {
-        ApiResponse<?> ar = new ApiResponse<>(HttpStatus.BAD_REQUEST);
-        ar.setError(iae.getLocalizedMessage());
-        return buildResponseEntity(ar);
+    public ResponseEntity<ApiResponse<String>> handleIllegalArgumentException(IllegalArgumentException e) {
+        return errorResponse(e.getLocalizedMessage(), BAD_REQUEST);
     }
 
     @Override
-    public ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException hmre, HttpHeaders headers, HttpStatus status,
+    protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException e,
+                                                               HttpHeaders headers, HttpStatus status,
                                                                WebRequest request) {
-        ApiResponse<?> ar = new ApiResponse<>(HttpStatus.BAD_REQUEST);
-        ar.setError("Validation Error: "+hmre.getMostSpecificCause().getLocalizedMessage());
-        return buildResponseEntity(ar);
-    }
-
-    @Override
-    public ResponseEntity<Object> handleBindException(BindException be, HttpHeaders headers, HttpStatus status,
-                                                      WebRequest request) {
-        ApiResponse<?> ar = new ApiResponse<>(HttpStatus.BAD_REQUEST);
-        ar.addValidationErrors(be.getFieldErrors());
-        ar.setError("Validation Error");
-        return buildResponseEntity(ar);
+        ApiResponse response = new ApiResponse<>(BAD_REQUEST);
+        response.setMessage("ERROR");
+        response.setResult(e.getMostSpecificCause().getLocalizedMessage());
+        return createResponse(response);
     }
 
     @ExceptionHandler(UsernameNotFoundException.class)
-    public ResponseEntity<Object> handleUsernameNotFoundException(UsernameNotFoundException e) {
-        ApiResponse<?> ar = new ApiResponse<>(HttpStatus.UNPROCESSABLE_ENTITY);
-        ar.setError(e.getMessage());
-        return buildResponseEntity(ar);
+    public ResponseEntity<ApiResponse<String>> handleUsernameNotFoundException(UsernameNotFoundException e) {
+        return errorResponse("Username does not exist", UNPROCESSABLE_ENTITY);
     }
 
     @Override
-    public ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException mx, HttpHeaders headers,
+    public ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException e, HttpHeaders headers,
                                                                HttpStatus status, WebRequest request) {
-        ApiResponse<?> ar = new ApiResponse<>(HttpStatus.BAD_REQUEST);
-        ar.addValidationError(mx.getBindingResult().getAllErrors());
-        ar.setError("Validation Error");
-        return buildResponseEntity(ar);
+        ApiResponse response = new ApiResponse<>(BAD_REQUEST);
+        response.setMessage("ERROR");
+        response.setResult(e.getBindingResult().getAllErrors());
+        return createResponse(response);
     }
 
-    private ResponseEntity<Object> buildResponseEntity(ApiResponse<?> apiResponse) {
-        return new ResponseEntity<>(apiResponse, apiResponse.getStatus());
+    @ExceptionHandler({ BadCredentialsException.class })
+    public ResponseEntity<ApiResponse<String>> handleBadCredentialsException(Exception ex) {
+        return errorResponse("Username or password is invalid. Check and try again",
+                HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler({ DisabledException.class })
+    public ResponseEntity<ApiResponse<String>> handleDisabledException(Exception ex) {
+        return errorResponse("User account is disabled. Please activate your account, and try again",
+                HttpStatus.BAD_REQUEST);
+    }
+
 }
