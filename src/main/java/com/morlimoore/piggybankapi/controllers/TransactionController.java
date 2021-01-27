@@ -17,9 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 
-import static com.morlimoore.piggybankapi.util.CreateResponse.bindingResultError;
-import static com.morlimoore.piggybankapi.util.CreateResponse.createResponse;
-import static org.springframework.http.HttpStatus.OK;
+import static com.morlimoore.piggybankapi.util.CreateResponse.*;
+import static org.springframework.http.HttpStatus.*;
 
 @RestController
 @RequestMapping("/transaction")
@@ -32,20 +31,13 @@ public class TransactionController {
     //TODO: Troubleshoot that the current deposit transaction does wipe off the initial transaction
     @PostMapping("/deposit")
     public ResponseEntity<ApiResponse<String>> deposit(@Valid @RequestBody UserTransactionDTO userTransactionDTO, BindingResult result) {
-        ApiResponse<String> response = new ApiResponse<>();
-        if (result.hasErrors()) {
-            logger.error(result.getFieldError().getDefaultMessage());
-            return bindingResultError(result);
-        }
+        if (result.hasErrors())
+            return errorResponse(result.getFieldError().getDefaultMessage(), UNPROCESSABLE_ENTITY);
+
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String username = userDetails.getUsername();
-        if (username != null) {
-            transactionService.makeTransaction(userTransactionDTO, username, "Deposit");
-            response = new ApiResponse<>(OK);
-            response.setData("Account deposit was successful");
-            response.setMessage("Success");
-        }
-        return createResponse(response);
+        transactionService.makeTransaction(userTransactionDTO, username, "Deposit");
+        return successResponse("Account deposit was successful", CREATED);
     }
 
 

@@ -1,27 +1,25 @@
 package com.morlimoore.piggybankapi.service.impl;
 
 import com.mashape.unirest.http.exceptions.UnirestException;
-import com.morlimoore.piggybankapi.dto.AuthResponseDTO;
 import com.morlimoore.piggybankapi.dto.LoginUserRequestDTO;
 import com.morlimoore.piggybankapi.dto.RegisterUserRequestDTO;
 import com.morlimoore.piggybankapi.entities.Token;
 import com.morlimoore.piggybankapi.entities.User;
+import com.morlimoore.piggybankapi.entities.UserDetailsImpl;
 import com.morlimoore.piggybankapi.exceptions.CustomException;
 import com.morlimoore.piggybankapi.payload.ApiResponse;
+import com.morlimoore.piggybankapi.payload.JwtResponse;
 import com.morlimoore.piggybankapi.repositories.TokenRepository;
 import com.morlimoore.piggybankapi.repositories.UserRepository;
-import com.morlimoore.piggybankapi.security.JwtTokenProvider;
+import com.morlimoore.piggybankapi.security.JwtUtils;
 import com.morlimoore.piggybankapi.service.AuthService;
 import com.morlimoore.piggybankapi.service.MailService;
 import com.morlimoore.piggybankapi.service.SignupTokenService;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -30,8 +28,10 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
-import static com.morlimoore.piggybankapi.util.CreateResponse.createResponse;
+import static com.morlimoore.piggybankapi.util.CreateResponse.*;
+import static com.morlimoore.piggybankapi.util.RoleEnum.ROLE_USER;
 import static org.springframework.http.HttpStatus.*;
 
 @Service
@@ -46,7 +46,8 @@ public class AuthServiceImpl implements AuthService {
     private final TokenRepository tokenRepository;
     private final MailService mailService;
     private final AuthenticationManager authenticationManager;
-    private final JwtTokenProvider jwtProvider;
+    private final JwtUtils jwtUtils;
+
 
     public AuthServiceImpl(UserRepository userRepository,
                            ModelMapper modelMapper,
@@ -55,7 +56,7 @@ public class AuthServiceImpl implements AuthService {
                            TokenRepository tokenRepository,
                            MailService mailService,
                            AuthenticationManager authenticationManager,
-                           JwtTokenProvider jwtProvider) {
+                           JwtUtils jwtUtils) {
         this.userRepository = userRepository;
         this.modelMapper = modelMapper;
         this.passwordEncoder = passwordEncoder;
@@ -63,19 +64,19 @@ public class AuthServiceImpl implements AuthService {
         this.tokenRepository = tokenRepository;
         this.mailService = mailService;
         this.authenticationManager = authenticationManager;
-        this.jwtProvider = jwtProvider;
+        this.jwtUtils = jwtUtils;
     }
 
     @Override
     @Transactional
-    public Boolean signup(RegisterUserRequestDTO registerUserRequestDto) throws UnirestException {
+    public ResponseEntity<ApiResponse<String>> signup(RegisterUserRequestDTO registerUserRequestDto) throws UnirestException {
         User user = modelMapper.map(registerUserRequestDto, User.class);
-        user.setRole("USER");
+        user.setRole(ROLE_USER);
         user.setPassword(passwordEncoder.encode(registerUserRequestDto.getPassword()));
         user.setIsEnabled(false);
-        User tempUser = null;
+        User res = null;
         try {
-            tempUser = userRepository.save(user);
+            res = userRepository.save(user);
         } catch (Exception e) {
             throw new CustomException("User with email already exists", BAD_REQUEST);
         }
@@ -84,53 +85,38 @@ public class AuthServiceImpl implements AuthService {
         token.setToken(signUpToken);
         token.setPurpose("SIGNUP");
         token.setIsValid(true);
-        token.setUser(tempUser);
+        token.setUser(res);
         tokenRepository.save(token);
-        mailService.sendActivationMail(tempUser.getEmail(), token.getToken());
-
-        return true;
+        mailService.sendActivationMail(res.getEmail(), token.getToken());
+        return successResponse("User Registration Successful", CREATED);
     }
 
     @Override
-    public ResponseEntity<Object> login(LoginUserRequestDTO loginUserRequestDto) {
-        if (!userRepository.getUserByEmail(loginUserRequestDto.getEmail()).isPresent()) {
-            ApiResponse<?> response = new ApiResponse<>(FORBIDDEN);
-            response.setError("User not found");
-            response.setMessage("Account does not exist");
-            response.setDebugMessage("Sign up to create an account with us");
-            return ResponseEntity.status(FORBIDDEN.value()).body(response);
-        }
+    public ResponseEntity<?> login(LoginUserRequestDTO loginUserRequestDto) {
+        if (!userRepository.getUserByEmail(loginUserRequestDto.getEmail()).isPresent())
+            return errorResponse("Account does not exist. Sign up to create an account with us", FORBIDDEN);
 
-        Authentication authenticate = null;
-        try {
-            authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+        Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                     loginUserRequestDto.getEmail(),
                     loginUserRequestDto.getPassword()
             ));
 
-        } catch (BadCredentialsException e) {
-            ApiResponse<?> response = new ApiResponse<>(HttpStatus.UNAUTHORIZED);
-            response.setError(e.getMessage());
-            response.setMessage("Email or password is incorrect");
-            response.setDebugMessage("Click the password reset button to reset your password");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED.value()).body(response);
-
-        } catch (DisabledException e) {
-            ApiResponse<?> response = new ApiResponse<>(FORBIDDEN);
-            response.setError(e.getMessage());
-            response.setMessage("Please, activate your account first");
-            response.setDebugMessage("Click the account verification link sent to the email address you provided on sign up.");
-            return ResponseEntity.status(FORBIDDEN.value()).body(response);
-        }
-
         SecurityContextHolder.getContext().setAuthentication(authenticate);
-        logger.info("Authenticate: " + authenticate.getName());
-        String token = jwtProvider.createLoginToken(authenticate.getName());
-        logger.info("Token: " + token);
-        AuthResponseDTO authResponseDto = new AuthResponseDTO(token, loginUserRequestDto.getEmail());
-        ApiResponse<AuthResponseDTO> response = new ApiResponse<>(OK);
-        response.setData(authResponseDto);
-        return ResponseEntity.ok(response);
+        String jwt = jwtUtils.generateJwtToken(authenticate);
+
+        UserDetailsImpl userDetails = (UserDetailsImpl) authenticate.getPrincipal();
+        String role = userDetails.getAuthorities().stream()
+                .map(item -> item.getAuthority())
+                .collect(Collectors.toList()).get(0);
+
+        ApiResponse<JwtResponse> response = new ApiResponse<>();
+        response.setStatus(OK);
+        response.setMessage("SUCCESS");
+        response.setResult(new JwtResponse(jwt,
+                userDetails.getId(),
+                userDetails.getUsername(),
+                role));
+        return createResponse(response);
     }
 
     @Override
@@ -143,10 +129,7 @@ public class AuthServiceImpl implements AuthService {
         } else {
             throw new CustomException("Token has been used", BAD_REQUEST);
         }
-        ApiResponse<String> response = new ApiResponse<>(OK);
-        response.setData("Account activated successfully");
-        response.setMessage("Success");
-        return createResponse(response);
+        return successResponse("Account activated successfully", OK);
     }
 
     @Transactional

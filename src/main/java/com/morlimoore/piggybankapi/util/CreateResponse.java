@@ -3,7 +3,6 @@ package com.morlimoore.piggybankapi.util;
 import com.morlimoore.piggybankapi.payload.ApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 
 public class CreateResponse {
 
@@ -11,12 +10,19 @@ public class CreateResponse {
         return new ResponseEntity<>(response, response.getStatus());
     }
 
-    public static ResponseEntity<ApiResponse<String>> bindingResultError(BindingResult result) {
-        ApiResponse<String> response = new ApiResponse<>(HttpStatus.BAD_REQUEST);
-        response.setMessage("Validation error");
-        response.setDebugMessage(result.getFieldError().getDefaultMessage());
-        response.setError(result.getFieldError().toString());
-        response.addValidationErrors(result.getFieldErrors());
+    public static ResponseEntity<ApiResponse<String>> errorResponse(String result, HttpStatus status) {
+        ApiResponse<String> response = new ApiResponse<>();
+        response.setStatus(status);
+        response.setMessage("ERROR");
+        response.setResult(result);
+        return createResponse(response);
+    }
+
+    public static ResponseEntity<ApiResponse<String>> successResponse(String result, HttpStatus status) {
+        ApiResponse<String> response = new ApiResponse<>();
+        response.setStatus(status);
+        response.setMessage("SUCCESS");
+        response.setResult(result);
         return createResponse(response);
     }
 }

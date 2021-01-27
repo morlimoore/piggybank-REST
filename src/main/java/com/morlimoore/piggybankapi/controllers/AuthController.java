@@ -27,24 +27,13 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<ApiResponse<String>> signup(@Valid @RequestBody RegisterUserRequestDTO registerUserRequestDto, BindingResult result) throws UnirestException {
+    public ResponseEntity<ApiResponse<String>> signup(@Valid @RequestBody RegisterUserRequestDTO registerUserRequestDto,
+                                                      BindingResult result) throws UnirestException {
         if (result.hasErrors())
-            return bindingResultError(result);
-        else if (!validateDateOfBirth(registerUserRequestDto.getDateOfBirth())) {
-            ApiResponse<String> response = new ApiResponse<>(BAD_REQUEST);
-            response.setError("User must be equal to or above 18 years of age");
-            response.setMessage("Invalid date of birth");
-            return createResponse(response);
-        } else if (authService.signup(registerUserRequestDto)) {
-            ApiResponse<String> response = new ApiResponse<>(OK);
-            response.setData("User Registration Successful");
-            response.setMessage("Success");
-            return createResponse(response);
-        }
-        ApiResponse<String> response = new ApiResponse<>(INTERNAL_SERVER_ERROR);
-        response.setError(response.getError());
-        response.setMessage("Failure");
-        return createResponse(response);
+            return errorResponse(result.getFieldError().getDefaultMessage(), BAD_REQUEST);
+        else if (!validateDateOfBirth(registerUserRequestDto.getDateOfBirth()))
+            return errorResponse("User must be equal to or above 18 years of age", BAD_REQUEST);
+        return authService.signup(registerUserRequestDto);
     }
 
     @GetMapping("/accountVerification/{token}")
@@ -53,7 +42,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Object> login(@RequestBody LoginUserRequestDTO loginUserRequestDto) {
+    public ResponseEntity<?> login(@RequestBody LoginUserRequestDTO loginUserRequestDto) {
         return authService.login(loginUserRequestDto);
     }
 }
