@@ -37,11 +37,6 @@ public class PiggybankApiApplication {
     }
 
     @Bean
-    PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(12);
-    }
-
-    @Bean
     public ServletWebServerFactory servletContainer() {
         //Specify that the traffic be secure
         TomcatServletWebServerFactory tomcat = new TomcatServletWebServerFactory() {
@@ -70,44 +65,5 @@ public class PiggybankApiApplication {
         connector.setSecure(false);
         connector.setRedirectPort(8443);
         return connector;
-    }
-
-    @Bean
-    JavaMailSender mailSender() {
-        return new JavaMailSender() {
-            @Override
-            public MimeMessage createMimeMessage() {
-                return null;
-            }
-
-            @Override
-            public MimeMessage createMimeMessage(InputStream inputStream) throws MailException {
-                return null;
-            }
-
-            @Override
-            public void send(MimeMessage mimeMessage) throws MailException {
-            }
-
-            @Override
-            public void send(MimeMessage... mimeMessages) throws MailException {
-            }
-
-            @Override
-            public void send(MimeMessagePreparator mimeMessagePreparator) throws MailException {
-            }
-
-            @Override
-            public void send(MimeMessagePreparator... mimeMessagePreparators) throws MailException {
-            }
-
-            @Override
-            public void send(SimpleMailMessage simpleMailMessage) throws MailException {
-            }
-
-            @Override
-            public void send(SimpleMailMessage... simpleMailMessages) throws MailException {
-            }
-        };
     }
 }
