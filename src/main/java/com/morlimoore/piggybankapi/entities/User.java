@@ -1,5 +1,6 @@
 package com.morlimoore.piggybankapi.entities;
 
+import com.morlimoore.piggybankapi.util.RoleEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -35,25 +36,7 @@ public class User extends BaseEntity {
     @Column(name = "is_enabled", nullable = false)
     private Boolean isEnabled;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 25)
-    private String role;
-
-    public User(String firstName, String lastName,
-                String email, String password, LocalDate dateOfBirth,
-                Boolean isEnabled, String role) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-        this.password = password;
-        this.dateOfBirth = dateOfBirth;
-        this.isEnabled = isEnabled;
-        this.role = role;
-    }
-
-//    public List<String> getRoles() {
-//        if (role.length() > 0) {
-//            return Arrays.asList(role.split(","));
-//        }
-//        return new ArrayList<>();
-//    }
+    private RoleEnum role;
 }
