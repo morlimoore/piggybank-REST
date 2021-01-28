@@ -15,7 +15,6 @@ public abstract class BaseEntity implements Serializable {
     private static final long serialVersionUID = 2L;
 
     @Id
-    @Column(unique = true, nullable = false)
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Long id;
 
