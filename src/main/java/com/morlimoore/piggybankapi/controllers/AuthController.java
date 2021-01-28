@@ -42,7 +42,10 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginUserRequestDTO loginUserRequestDto) {
+    public ResponseEntity<?> login(@Valid @RequestBody LoginUserRequestDTO loginUserRequestDto,
+                                   BindingResult result) {
+        if (result.hasErrors())
+            return errorResponse(result.getFieldError().getDefaultMessage(), BAD_REQUEST);
         return authService.login(loginUserRequestDto);
     }
 }
