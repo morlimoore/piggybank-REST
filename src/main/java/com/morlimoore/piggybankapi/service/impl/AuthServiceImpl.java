@@ -1,6 +1,5 @@
 package com.morlimoore.piggybankapi.service.impl;
 
-import com.mashape.unirest.http.exceptions.UnirestException;
 import com.morlimoore.piggybankapi.dto.LoginUserRequestDTO;
 import com.morlimoore.piggybankapi.dto.RegisterUserRequestDTO;
 import com.morlimoore.piggybankapi.entities.Token;
@@ -69,7 +68,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     @Transactional
-    public ResponseEntity<ApiResponse<String>> signup(RegisterUserRequestDTO registerUserRequestDto) throws UnirestException {
+    public ResponseEntity<ApiResponse<String>> signup(RegisterUserRequestDTO registerUserRequestDto) {
         User user = modelMapper.map(registerUserRequestDto, User.class);
         user.setRole(ROLE_USER);
         user.setPassword(passwordEncoder.encode(registerUserRequestDto.getPassword()));
@@ -88,7 +87,8 @@ public class AuthServiceImpl implements AuthService {
         token.setUser(res);
         tokenRepository.save(token);
         mailService.sendActivationMail(res.getEmail(), token.getToken());
-        return successResponse("User Registration Successful", CREATED);
+        logger.info("Account verification email sent!");
+        return successResponse("User Registration Successful. Check email for account verification link.", CREATED);
     }
 
     @Override
