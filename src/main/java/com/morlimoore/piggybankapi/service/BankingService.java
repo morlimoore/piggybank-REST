@@ -17,6 +17,6 @@ public interface BankingService {
 
     void deposit(Transaction transaction, User user, String remarks);
 
-    boolean isEligibleToWithdraw(Long user_id, Long amount);
+    boolean isEligibleToWithdraw(User user, Long amount);
 
 }
