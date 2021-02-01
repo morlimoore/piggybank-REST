@@ -1,6 +1,6 @@
 package com.morlimoore.piggybankapi.config;
 
-import com.morlimoore.piggybankapi.security.JwtAuthEntryPoint;
+import com.morlimoore.piggybankapi.security.AuthEntryPointFailureHandler;
 import com.morlimoore.piggybankapi.security.JwtAuthTokenFilter;
 import com.morlimoore.piggybankapi.service.impl.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +27,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     UserDetailsServiceImpl userDetailsService;
 
     @Autowired
-    private JwtAuthEntryPoint jwtAuthEntryPoint;
+    private AuthEntryPointFailureHandler authEntryPointFailureHandler;
 
     @Bean
     public JwtAuthTokenFilter authTokenFilter() {
@@ -68,7 +68,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.cors().and().csrf().disable()
-                .exceptionHandling().authenticationEntryPoint(jwtAuthEntryPoint).and()
+                .exceptionHandling()
+                .authenticationEntryPoint(authEntryPointFailureHandler)
+                .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
