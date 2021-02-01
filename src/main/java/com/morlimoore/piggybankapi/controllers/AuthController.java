@@ -1,6 +1,5 @@
 package com.morlimoore.piggybankapi.controllers;
 
-import com.mashape.unirest.http.exceptions.UnirestException;
 import com.morlimoore.piggybankapi.dto.LoginUserRequestDTO;
 import com.morlimoore.piggybankapi.dto.RegisterUserRequestDTO;
 import com.morlimoore.piggybankapi.payload.ApiResponse;
@@ -28,7 +27,7 @@ public class AuthController {
 
     @PostMapping("/signup")
     public ResponseEntity<ApiResponse<String>> signup(@Valid @RequestBody RegisterUserRequestDTO registerUserRequestDto,
-                                                      BindingResult result) throws UnirestException {
+                                                      BindingResult result) {
         if (result.hasErrors())
             return errorResponse(result.getFieldError().getDefaultMessage(), BAD_REQUEST);
         else if (!validateDateOfBirth(registerUserRequestDto.getDateOfBirth()))
