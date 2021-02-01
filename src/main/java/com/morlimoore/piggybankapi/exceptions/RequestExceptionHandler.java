@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -26,6 +27,11 @@ public class RequestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(CustomException.class)
     public ResponseEntity<ApiResponse<String>> handleCustomException(CustomException e) {
         return errorResponse(e.getLocalizedMessage(), INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ApiResponse<String>> handleAuthenticationException(AuthenticationException e) {
+        return errorResponse(e.getMessage(), UNAUTHORIZED);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
@@ -48,7 +54,7 @@ public class RequestExceptionHandler extends ResponseEntityExceptionHandler {
         return createResponse(response);
     }
 
-    @ExceptionHandler(UsernameNotFoundException.class)
+    @ExceptionHandler({ UsernameNotFoundException.class })
     public ResponseEntity<ApiResponse<String>> handleUsernameNotFoundException(UsernameNotFoundException e) {
         return errorResponse("Username does not exist", UNPROCESSABLE_ENTITY);
     }
