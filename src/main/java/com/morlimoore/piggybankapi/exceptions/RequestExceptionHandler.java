@@ -26,7 +26,7 @@ public class RequestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(CustomException.class)
     public ResponseEntity<ApiResponse<String>> handleCustomException(CustomException e) {
-        return errorResponse(e.getLocalizedMessage(), INTERNAL_SERVER_ERROR);
+        return errorResponse(e.getLocalizedMessage(), e.getStatus());
     }
 
     @ExceptionHandler(AuthenticationException.class)
@@ -41,7 +41,7 @@ public class RequestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ApiResponse<String>> handleIllegalArgumentException(IllegalArgumentException e) {
-        return errorResponse(e.getLocalizedMessage(), BAD_REQUEST);
+        return errorResponse(e.getLocalizedMessage(), INTERNAL_SERVER_ERROR);
     }
 
     @Override

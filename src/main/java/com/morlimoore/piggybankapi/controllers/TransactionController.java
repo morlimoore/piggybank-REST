@@ -1,14 +1,15 @@
 package com.morlimoore.piggybankapi.controllers;
 
-import com.morlimoore.piggybankapi.dto.UserTransactionDTO;
+import com.morlimoore.piggybankapi.dto.TransactionDTO;
+import com.morlimoore.piggybankapi.entities.User;
 import com.morlimoore.piggybankapi.payload.ApiResponse;
 import com.morlimoore.piggybankapi.service.TransactionService;
+import com.morlimoore.piggybankapi.util.AuthUtil;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,19 +26,23 @@ import static org.springframework.http.HttpStatus.*;
 @AllArgsConstructor
 public class TransactionController {
 
+    @Autowired
+    private final AuthUtil authUtil;
+
     private static final Logger logger = LoggerFactory.getLogger(TransactionController.class);
     private TransactionService transactionService;
 
     //TODO: Troubleshoot that the current deposit transaction does wipe off the initial transaction
-    @PostMapping("/deposit")
-    public ResponseEntity<ApiResponse<String>> deposit(@Valid @RequestBody UserTransactionDTO userTransactionDTO, BindingResult result) {
+    @PostMapping("/execute")
+    public ResponseEntity<ApiResponse<String>> deposit(@Valid @RequestBody TransactionDTO transactionDTO,
+                                                       BindingResult result) {
         if (result.hasErrors())
             return errorResponse(result.getFieldError().getDefaultMessage(), UNPROCESSABLE_ENTITY);
 
-        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String username = userDetails.getUsername();
-        transactionService.makeTransaction(userTransactionDTO, username, "Deposit");
-        return successResponse("Account deposit was successful", CREATED);
+        User user = authUtil.getAuthenticatedUser();
+        transactionService.makeTransaction(transactionDTO, user);
+        return successResponse(String.format("Funds %s was successful.",
+                transactionDTO.getType().toLowerCase()), CREATED);
     }
 
 

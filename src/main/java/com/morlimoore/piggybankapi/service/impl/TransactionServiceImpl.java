@@ -1,6 +1,6 @@
 package com.morlimoore.piggybankapi.service.impl;
 
-import com.morlimoore.piggybankapi.dto.UserTransactionDTO;
+import com.morlimoore.piggybankapi.dto.TransactionDTO;
 import com.morlimoore.piggybankapi.entities.Transaction;
 import com.morlimoore.piggybankapi.entities.User;
 import com.morlimoore.piggybankapi.exceptions.CustomException;
@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+import static com.morlimoore.piggybankapi.util.TransactionEnum.*;
+
 @Service
 @AllArgsConstructor
 public class TransactionServiceImpl implements TransactionService {
@@ -23,30 +25,26 @@ public class TransactionServiceImpl implements TransactionService {
     private UserRepository userRepository;
 
     @Override
-    public void makeTransaction(UserTransactionDTO userTransactionDTO, String username, String type) throws CustomException {
-        if (userTransactionDTO != null && username != null) {
-            Transaction transaction = modelMapper.map(userTransactionDTO, Transaction.class);
-            Optional<User> userOptional = userRepository.getUserByEmail(username);
+    public void makeTransaction(TransactionDTO transactionDTO, User user) throws CustomException {
+        Transaction transaction = modelMapper.map(transactionDTO, Transaction.class);
+        System.out.println("Type: " + transaction.getType());
 
-            if (userOptional.isPresent()) {
-                User user = userOptional.get();
-                if (type.equals("Withdrawal")) {
-                    bankingService.withdraw(transaction, user, "By SELF");
+        if (transaction.getType().equals(WITHDRAWAL)) {
+            bankingService.withdraw(transaction, user,"WITHDRAWAL by SELF");
 
-                } else if (type.equals("Deposit")) {
-                    bankingService.deposit(transaction, user, "By SELF");
+        } else if (transaction.getType().equals(DEPOSIT)) {
+            bankingService.deposit(transaction, user,"DEPOSIT By SELF");
 
-                } else if (type.equals("Transfer")) {
-                    Optional<User> optional = userRepository.getUserByEmail(userTransactionDTO.getRecipientEmail());
-                    User recipient = optional.orElseThrow(() -> new CustomException("Entered email is not a customer", HttpStatus.BAD_REQUEST));
-                    bankingService.withdraw(transaction, user, "TRF-OUT to " + recipient.getEmail());
-                    Transaction transaction2 = new Transaction();
-                    transaction2.setAmount(transaction.getAmount());
-                    bankingService.deposit(transaction2, recipient, "TRF-IN from " + username);
-                }
-            } else {
-                throw new CustomException("Transaction failed", HttpStatus.BAD_REQUEST);
-            }
+        } else if (transaction.getType().equals(TRANSFER)) {
+            Optional<User> optional = userRepository.getUserByEmail(transactionDTO.getRecipientEmail());
+            User recipient = optional.orElseThrow(
+                    () -> new CustomException("Provided recipient is not a customer of this bank.",
+                            HttpStatus.BAD_REQUEST));
+            bankingService.withdraw(transaction, user, "OUTBOUND TRANSFER to " + recipient.getEmail());
+            Transaction transaction2 = new Transaction();
+            transaction2.setAmount(transaction.getAmount());
+            bankingService.deposit(transaction2, recipient, "INBOUND TRANSFER from " + user.getEmail());
         }
+
     }
 }

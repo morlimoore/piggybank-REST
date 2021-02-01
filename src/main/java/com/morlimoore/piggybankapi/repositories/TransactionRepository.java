@@ -1,6 +1,7 @@
 package com.morlimoore.piggybankapi.repositories;
 
 import com.morlimoore.piggybankapi.entities.Transaction;
+import com.morlimoore.piggybankapi.entities.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -11,5 +12,5 @@ import java.util.List;
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
 
 //    @Query(value="SELECT * FROM transactions WHERE user_id = ?1", nativeQuery = true)
-    List<Transaction> findAllTransactionsByUser(Long user_id);
+    List<Transaction> findAllTransactionsByUser(User user);
 }

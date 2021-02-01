@@ -7,11 +7,11 @@ import java.util.List;
 
 public interface BankingService {
 
-    List<Transaction> getUserTransactions(Long user_id);
+    List<Transaction> getUserTransactions(User user);
 
-    Long getUserAccountBalance(Long user_id);
+    Long getUserAccountBalance(User user);
 
-    String getUserAccountBalanceFormatted(Long user_id);
+    String getUserAccountBalanceFormatted(User user);
 
     void withdraw(Transaction transaction, User user, String remarks);
 

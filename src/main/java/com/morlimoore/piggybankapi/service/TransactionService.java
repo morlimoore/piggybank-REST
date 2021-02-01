@@ -1,8 +1,9 @@
 package com.morlimoore.piggybankapi.service;
 
-import com.morlimoore.piggybankapi.dto.UserTransactionDTO;
+import com.morlimoore.piggybankapi.dto.TransactionDTO;
+import com.morlimoore.piggybankapi.entities.User;
 
 public interface TransactionService {
 
-    void makeTransaction(UserTransactionDTO userTransactionDTO, String username, String type);
+    void makeTransaction(TransactionDTO transactionDTO, User user);
 }
